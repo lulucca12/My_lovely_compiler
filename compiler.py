@@ -1,7 +1,7 @@
 from itertools import chain
 
 tokens ={
-'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
+'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
 }
@@ -37,18 +37,26 @@ def Compile(str):
     num = []
     isSum = False
     isValue = False
+    isIf = False
     var = 0
     numSum = 0
-    varBool = False
+    varBool = []
+    boolIncrement = 0
     for i in compiler:
         if i == 'VALUE':
-            isValue = True
+            if boolIncrement == 0:
+                isValue = True
+        elif i == 'IF':
+            isValue = False
+            isIf = True
         elif i == 'TRUE':
+            boolIncrement = boolIncrement + 1
             isValue = False
-            varBool = True
+            varBool.append(True)
         elif i == 'FALSE':
+            boolIncrement = boolIncrement + 1
             isValue = False
-            varBool = False
+            varBool.append(False)
         elif i == 'SUM':
             isSum = True
         elif (i == '0' or i == '1'or i == '2'or i == '3'or i == '4'or i == '5'or i == '6'or i == '7'or i == '8'or i == '9'):
@@ -63,14 +71,32 @@ def Compile(str):
         return numSum
 
     elif isValue == True:
-        var = var + num[0]
-        isValue = False
-        if isSum == False:
-            return var
+        try:
+            var = var + num[0]
+            isValue = False
+            if isSum == False:
+                return var
+        except:
+            print('No value provided to the variable ')
+        
+            
     
     elif isValue == False:
-        return varBool
-    
+        try:
+            if isIf == True:
+                if boolIncrement > 4:
+                    if varBool[1] == True:
+                        return varBool[2]
+                    else:
+                        return varBool[3]
+                else:
+                    if varBool[0] == True:
+                        return varBool[1]
+                    else:
+                        return varBool[2]
+            return varBool[0]
+        except:
+           print('Provide parameter to the if condition!')
     
     return False
 
