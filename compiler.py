@@ -1,7 +1,7 @@
 from itertools import chain
 
 tokens ={
-'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
+'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
 }
@@ -9,18 +9,18 @@ tokens ={
 print("My_lovely_Compiler >>>",end='')
 string = input()
 
-def Tokens(str):
+def Tokens(strings):
     try:
         for i in tokens:
-            for j in str:
-                if(tokens[str] == str):
-                    return tokens[str]
+            for j in strings:
+                if(tokens[strings] == strings):
+                    return tokens[strings]
     except:
         return False
 
 
-def Parse(str):
-    count = [x.split() for x in str.split(',')]
+def Parse(strings):
+    count = [x.split() for x in strings.split(',')]
     count = [x for x in chain(*count)]
     final = []
     
@@ -32,23 +32,33 @@ def Parse(str):
         
     return final
 
-def Compile(str):
+def Compile(strings):
     compiler = Parse(string)
     num = []
     isSum = False
     isValue = False
     isIf = False
+    isElse = False
+    isFor = False
     var = 0
     numSum = 0
+    varFor = ''
     varBool = []
     boolIncrement = 0
     for i in compiler:
         if i == 'VALUE':
             if boolIncrement == 0:
                 isValue = True
+        elif i == 'FOR':
+            isValue = False
+            isFor = True
         elif i == 'IF':
             isValue = False
             isIf = True
+        elif i == 'ELSE':
+            isValue = False
+            isIf = True
+            isElse = True
         elif i == 'TRUE':
             boolIncrement = boolIncrement + 1
             isValue = False
@@ -79,22 +89,30 @@ def Compile(str):
         except:
             print('No value provided to the variable ')
         
+    elif isFor == True and isSum == False:
+        try:
+            for i in range(num[0]):
+                varFor = varFor +' '+ str(num[1])
+            return varFor
+                
+        except:
+            print ('No value provided to the for')
             
     
     elif isValue == False:
         try:
-            if isIf == True:
+            if isIf == True: 
                 if boolIncrement > 4:
                     if varBool[1] == True:
                         return varBool[2]
-                    else:
+                    elif isElse == True:
                         return varBool[3]
                 else:
                     if varBool[0] == True:
                         return varBool[1]
-                    else:
+                    elif isElse == True:
                         return varBool[2]
-            return varBool[0]
+                return varBool[0]
         except:
            print('Provide parameter to the if condition!')
     
