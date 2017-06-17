@@ -1,4 +1,6 @@
-from itertools import chain
+from itertools import chain #import chain function from itertools module
+
+#an tokens dictionary with all valid tokens
 
 tokens ={
 'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
@@ -6,8 +8,15 @@ tokens ={
 '7' : '7', '8' : '8', '9' : '9'
 }
 
+#prints the prompt and puts the end at the same line
 print("My_lovely_Compiler >>>",end='')
+
+#the string input from the prompt
 string = input()
+
+#function Tokens that recieves a string and verifies if it is valid
+#if so returns it self
+#else returns false
 
 def Tokens(strings):
     try:
@@ -19,32 +28,77 @@ def Tokens(strings):
         return False
 
 
+#parses the string recieved verifiying if it is valid with the token function
+#if it is removes all non-token characters(whitespaces,commas,parentesis,etc)
+#and returns an arrays with the result
+#else it raises an NameError saying that the token was not valid
+    
 def Parse(strings):
+    
+    #removes whitespaces and commas
     count = [x.split() for x in strings.split(',')]
+    
+    #chains the array leaving it in the outside array
     count = [x for x in chain(*count)]
+    
+    #the final array that will be returned
     final = []
+
     
     for i in count:
+        
+        #if the token is valid
         if(Tokens(i) != False):
+            
+            #append it in the arrray
             final.append(Tokens(i))
+
+        #else raises an error
         else:
             raise NameError('Incorrect Token!')
-        
+
+    #returns the result    
     return final
 
 def Compile(strings):
+    
+    #parses the string and returns the array to compiler
     compiler = Parse(string)
+    
+    #numbers array, stores all numbers
     num = []
+
+    #if you type SUM evaluates to TRUE
     isSum = False
+    
+    #if you type SUM evaluates to TRUE
     isValue = False
+    
+    #if you type SUM evaluates to TRUE
     isIf = False
+    
+     #if you type SUM evaluates to TRUE
     isElse = False
+    
+     #if you type SUM evaluates to TRUE
     isFor = False
+
+    #if you type VALUE next to a number saves it here
     var = 0
+
+    #the sum of all numbers in the SUM command
     numSum = 0
+
+    #what will be returned if you type FOR next to 2 numbers
     varFor = ''
+
+    #the array that stores all boolean values
     varBool = []
+
+    #a counter for the number of boolean values
     boolIncrement = 0
+
+    #tests for all possibilities just descibed
     for i in compiler:
         if i == 'VALUE':
             if boolIncrement == 0:
@@ -72,14 +126,16 @@ def Compile(strings):
         elif (i == '0' or i == '1'or i == '2'or i == '3'or i == '4'or i == '5'or i == '6'or i == '7'or i == '8'or i == '9'):
             num.append(int(i))
 
-
+    #tests for if you typed SUM, adds all numbers and returns the result
     if isSum == True:
         for element in num:
             if element != var:  
                 numSum = numSum + element + var
             isSum = False
         return numSum
-
+    
+    #tests if you typed VALUE and returns the value you typed saving it to a variable
+    #if no value provided throws an exception(printing it to the screen)
     elif isValue == True:
         try:
             var = var + num[0]
@@ -88,7 +144,10 @@ def Compile(strings):
                 return var
         except:
             print('No value provided to the variable ')
-        
+
+    #tests if you typed FOR and not SUM
+    #then returns the value you typed how many times you like
+    #thows exception for no parameters
     elif isFor == True and isSum == False:
         try:
             for i in range(num[0]):
@@ -98,7 +157,9 @@ def Compile(strings):
         except:
             print ('No value provided to the for')
             
-    
+    #tests if its not a variable and you typed IF
+    #if so return the value based on the parameters(bugy)
+    #throws exception for no parameters
     elif isValue == False:
         try:
             if isIf == True: 
