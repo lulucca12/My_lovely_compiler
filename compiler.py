@@ -136,7 +136,7 @@ def Compile(strings):
     
     #tests if you typed VALUE and returns the value you typed saving it to a variable
     #if no value provided throws an exception(printing it to the screen)
-    elif isValue == True:
+    elif isValue == True and isIf == False:
         try:
             var = var + num[0]
             isValue = False
