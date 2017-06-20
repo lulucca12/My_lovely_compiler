@@ -3,7 +3,7 @@ from itertools import chain #import chain function from itertools module
 #an tokens dictionary with all valid tokens
 
 tokens ={
-'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
+'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
 }
@@ -98,6 +98,9 @@ def Compile(strings):
     #a counter for the number of boolean values
     boolIncrement = 0
 
+    #is True if you typed EQUALS
+    isEqual = False
+
     #tests for all possibilities just descibed
     for i in compiler:
         if i == 'VALUE':
@@ -109,6 +112,8 @@ def Compile(strings):
         elif i == 'IF':
             isValue = False
             isIf = True
+        elif i == 'EQUALS':
+            isEqual = True
         elif i == 'ELSE':
             isValue = False
             isIf = True
@@ -169,11 +174,20 @@ def Compile(strings):
                     elif isElse == True:
                         return varBool[3]
                 else:
-                    if varBool[0] == True:
+                    if isEqual == True:
+                        if(num[0] == num[1]):
+                            return varBool[0]
+                        elif isElse == True:
+                            return varBool[1]
+                    elif varBool[0] == True:
                         return varBool[1]
                     elif isElse == True:
                         return varBool[2]
                 return varBool[0]
+            elif varBool[0] == True:
+                return True
+            elif varBool[0] == False:
+                return False
         except:
            print('Provide parameter to the if condition!')
     
