@@ -3,7 +3,7 @@ from itertools import chain #import chain function from itertools module
 #an tokens dictionary with all valid tokens
 
 tokens ={
-'SUM' : 'SUM','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
+'SUM' : 'SUM','SQU':'SQU','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
 }
@@ -101,6 +101,10 @@ def Compile(strings):
     #is True if you typed EQUALS
     isEqual = False
 
+    #is True if you typed SQU and stores in numSquare
+    isSquare = False
+    numSquare = 1
+
     #tests for all possibilities just descibed
     for i in compiler:
         if i == 'VALUE':
@@ -128,6 +132,8 @@ def Compile(strings):
             varBool.append(False)
         elif i == 'SUM':
             isSum = True
+        elif i == 'SQU':
+            isSquare = True
         elif (i == '0' or i == '1'or i == '2'or i == '3'or i == '4'or i == '5'or i == '6'or i == '7'or i == '8'or i == '9'):
             num.append(int(i))
 
@@ -145,10 +151,21 @@ def Compile(strings):
         try:
             var = var + num[0]
             isValue = False
-            if isSum == False:
+            if isSum == False and isSquare == False:
                 return var
         except:
             print('No value provided to the variable ')
+
+    #tests if you typed SQU and returns the square of all elements
+    if isSquare == True:
+        if isValue == True:
+            for element in num:
+                numSquare = numSquare * (var * var)
+            return numSquare
+        else:
+            for element in num:
+                numSquare = numSquare * (element * element)
+            return numSquare
 
     #tests if you typed FOR and not SUM
     #then returns the value you typed how many times you like
