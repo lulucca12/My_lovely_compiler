@@ -3,7 +3,9 @@ from itertools import chain #import chain function from itertools module
 #an tokens dictionary with all valid tokens
 
 tokens ={
-'SUM' : 'SUM','SQU':'SQU','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND', '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
+'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF',
+'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR',
+'(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
 }
@@ -108,6 +110,9 @@ def Compile(strings):
     #is True if you typed AND
     isAnd = False
 
+    #is True if you typed OR
+    isOr = False
+
     #tests for all possibilities just descibed
     for i in compiler:
         if i == 'VALUE':
@@ -123,6 +128,8 @@ def Compile(strings):
             isEqual = True
         elif i == 'AND':
             isAnd = True
+        elif i == 'OR':
+            isOr = True
         elif i == 'ELSE':
             isValue = False
             isIf = True
@@ -137,7 +144,7 @@ def Compile(strings):
             varBool.append(False)
         elif i == 'SUM':
             isSum = True
-        elif i == 'SQU':
+        elif i == 'SQUARE':
             isSquare = True
         elif (i == '0' or i == '1'or i == '2'or i == '3'or i == '4'or i == '5'or i == '6'or i == '7'or i == '8'or i == '9'):
             num.append(int(i))
@@ -201,7 +208,7 @@ def Compile(strings):
                             return varBool[0]
                         elif isElse == True:
                             return varBool[1]
-                    elif isAnd == False:
+                    elif isAnd == False and isOr == False:
                         if varBool[0] == True:
                             return varBool[1]
                         elif isElse == True:
@@ -211,12 +218,18 @@ def Compile(strings):
                             return varBool[2]
                         elif isElse == True:
                             return varBool[3]
+                    elif isOr == True:
+                        if varBool[0] == True or varBool[1] == True:
+                            return varBool[2]
+                        elif isElse == True:
+                            return varBool[3]
                             
                 return varBool[0]
-            elif varBool[0] == True:
-                return True
-            elif varBool[0] == False:
-                return False
+            elif boolIncrement >= 1:
+                if varBool[0] == True:
+                    return True
+                elif varBool[0] == False:
+                    return False
         except:
            print('Provide parameter to the if condition!')
     
