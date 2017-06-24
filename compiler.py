@@ -4,7 +4,7 @@ from itertools import chain #import chain function from itertools module
 
 tokens ={
 'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF',
-'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR',
+'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT',
 '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
@@ -113,6 +113,9 @@ def Compile(strings):
     #is True if you typed OR
     isOr = False
 
+    #is True if you typed NOT
+    isNot = False
+
     #tests for all possibilities just descibed
     for i in compiler:
         if i == 'VALUE':
@@ -130,18 +133,32 @@ def Compile(strings):
             isAnd = True
         elif i == 'OR':
             isOr = True
+        elif i == 'NOT':
+            isNot = True
         elif i == 'ELSE':
             isValue = False
             isIf = True
             isElse = True
         elif i == 'TRUE':
-            boolIncrement = boolIncrement + 1
-            isValue = False
-            varBool.append(True)
+            if isNot == False:
+                boolIncrement = boolIncrement + 1
+                isValue = False
+                varBool.append(True)
+            else:
+                boolIncrement = boolIncrement + 1
+                isValue = False
+                varBool.append(False)
+                isNot = False
         elif i == 'FALSE':
-            boolIncrement = boolIncrement + 1
-            isValue = False
-            varBool.append(False)
+            if isNot == False:
+                boolIncrement = boolIncrement + 1
+                isValue = False
+                varBool.append(False)
+            else:
+                boolIncrement = boolIncrement + 1
+                isValue = False
+                varBool.append(True)
+                isNot = False
         elif i == 'SUM':
             isSum = True
         elif i == 'SQUARE':
