@@ -3,8 +3,8 @@ from itertools import chain #import chain function from itertools module
 #an tokens dictionary with all valid tokens
 
 tokens ={
-'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF',
-'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT',
+'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','INDEXTOKEN':'INDEXTOKEN',
+'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','COMPILE':'COMPILE',
 '(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
 '3' : '3', '4' : '4',  '5' : '5', '6' : '6',
 '7' : '7', '8' : '8', '9' : '9'
@@ -62,10 +62,11 @@ def Parse(strings):
     #returns the result    
     return final
 
-def Compile(strings):
+def Compile(strings,toCompile):
     
     #parses the string and returns the array to compiler
-    compiler = Parse(string)
+    if(toCompile == True):
+        compiler = Parse(strings)
     
     #numbers array, stores all numbers
     num = []
@@ -116,30 +117,56 @@ def Compile(strings):
     #is True if you typed NOT
     isNot = False
 
+    #is True if you typed COMPILE
+    isCompile = False
+
+    #is True if you typed INDEXTOKEN
+    isIndex = False
+    index = 0
+    tokenIndex = 0
+    
     #tests for all possibilities just descibed
     for i in compiler:
+        if i == 'COMPILE':
+            isCompile = True
+            with open("compile.txt","r") as file:
+                string = file.read()
+            break
+        if i == 'INDEXTOKEN':
+            if tokenIndex != 0:
+                tokenIndex = tokenIndex + 1
+            isIndex = True
         if i == 'VALUE':
+            tokenIndex = tokenIndex + 1
             if boolIncrement == 0:
                 isValue = True
         elif i == 'FOR':
+            tokenIndex = tokenIndex + 1
             isValue = False
             isFor = True
         elif i == 'IF':
+            tokenIndex = tokenIndex + 1
             isValue = False
             isIf = True
         elif i == 'EQUALS':
+            tokenIndex = tokenIndex + 1
             isEqual = True
         elif i == 'AND':
+            tokenIndex = tokenIndex + 1
             isAnd = True
         elif i == 'OR':
+            tokenIndex = tokenIndex + 1
             isOr = True
         elif i == 'NOT':
+            tokenIndex = tokenIndex + 1
             isNot = True
         elif i == 'ELSE':
+            tokenIndex = tokenIndex + 1
             isValue = False
             isIf = True
             isElse = True
         elif i == 'TRUE':
+            tokenIndex = tokenIndex + 1
             if isNot == False:
                 boolIncrement = boolIncrement + 1
                 isValue = False
@@ -150,6 +177,7 @@ def Compile(strings):
                 varBool.append(False)
                 isNot = False
         elif i == 'FALSE':
+            tokenIndex = tokenIndex + 1
             if isNot == False:
                 boolIncrement = boolIncrement + 1
                 isValue = False
@@ -160,96 +188,110 @@ def Compile(strings):
                 varBool.append(True)
                 isNot = False
         elif i == 'SUM':
+            tokenIndex = tokenIndex + 1
             isSum = True
         elif i == 'SQUARE':
+            tokenIndex = tokenIndex + 1
             isSquare = True
         elif (i == '0' or i == '1'or i == '2'or i == '3'or i == '4'or i == '5'or i == '6'or i == '7'or i == '8'or i == '9'):
+            tokenIndex = tokenIndex + 1
             num.append(int(i))
+            if isIndex == True:
+                index = int(i)
+                isIndex = False
 
-    #tests for if you typed SUM, adds all numbers and returns the result
-    if isSum == True:
-        for element in num:
-            if element != var:  
-                numSum = numSum + element + var
-            isSum = False
-        return numSum
-    
-    #tests if you typed VALUE and returns the value you typed saving it to a variable
-    #if no value provided throws an exception(printing it to the screen)
-    elif isValue == True and isIf == False:
-        try:
-            var = var + num[0]
-            isValue = False
-            if isSum == False and isSquare == False:
-                return var
-        except:
-            print('No value provided to the variable ')
-
-    #tests if you typed SQU and returns the square of all elements
-    if isSquare == True:
-        if isValue == True:
+    if isCompile == False:
+        #tests for if you typed SUM, adds all numbers and returns the result
+        if isSum == True:
             for element in num:
-                numSquare = numSquare * (var * var)
-            return numSquare
-        else:
-            for element in num:
-                numSquare = numSquare * (element * element)
-            return numSquare
+                if element != var:  
+                    numSum = numSum + element + var
+                isSum = False
+            return numSum
+        
+        if isIndex == True:
+            compiler[tokenIndex] = compiler[index]
+            string = compiler
+            return Compile(string, False)
+        
+        #tests if you typed VALUE and returns the value you typed saving it to a variable
+        #if no value provided throws an exception(printing it to the screen)
+        elif isValue == True and isIf == False:
+            try:
+                var = var + num[0]
+                isValue = False
+                if isSum == False and isSquare == False:
+                    return var
+            except:
+                print('No value provided to the variable ')
 
-    #tests if you typed FOR and not SUM
-    #then returns the value you typed how many times you like
-    #thows exception for no parameters
-    elif isFor == True and isSum == False:
-        try:
-            for i in range(num[0]):
-                varFor = varFor +' '+ str(num[1])
-            return varFor
+        #tests if you typed SQU and returns the square of all elements
+        if isSquare == True:
+            if isValue == True:
+                for element in num:
+                    numSquare = numSquare * (var * var)
+                return numSquare
+            else:
+                for element in num:
+                    numSquare = numSquare * (element * element)
+                return numSquare
+
+        #tests if you typed FOR and not SUM
+        #then returns the value you typed how many times you like
+        #thows exception for no parameters
+        elif isFor == True and isSum == False:
+            try:
+                for i in range(num[0]):
+                    varFor = varFor +' '+ str(num[1])
+                return varFor
+                    
+            except:
+                print ('No value provided to the for')
                 
-        except:
-            print ('No value provided to the for')
-            
-    #tests if its not a variable and you typed IF
-    #if so return the value based on the parameters(bugy)
-    #throws exception for no parameters
-    elif isValue == False:
-        try:
-            if isIf == True: 
-                if boolIncrement > 4:
-                    if varBool[1] == True:
-                        return varBool[2]
-                    elif isElse == True:
-                        return varBool[3]
-                else:
-                    if isEqual == True:
-                        if(num[0] == num[1]):
-                            return varBool[0]
-                        elif isElse == True:
-                            return varBool[1]
-                    elif isAnd == False and isOr == False:
-                        if varBool[0] == True:
-                            return varBool[1]
-                        elif isElse == True:
-                            return varBool[2]
-                    elif isAnd == True:
-                        if varBool[0] == True and varBool[1] == True:
+        #tests if its not a variable and you typed IF
+        #if so return the value based on the parameters(bugy)
+        #throws exception for no parameters
+        elif isValue == False:
+            try:
+                if isIf == True: 
+                    if boolIncrement > 4:
+                        if varBool[1] == True:
                             return varBool[2]
                         elif isElse == True:
                             return varBool[3]
-                    elif isOr == True:
-                        if varBool[0] == True or varBool[1] == True:
-                            return varBool[2]
-                        elif isElse == True:
-                            return varBool[3]
-                            
-                return varBool[0]
-            elif boolIncrement >= 1:
-                if varBool[0] == True:
-                    return True
-                elif varBool[0] == False:
-                    return False
-        except:
-           print('Provide parameter to the if condition!')
-    
-    return False
+                    else:
+                        if isEqual == True:
+                            if(num[0] == num[1]):
+                                return varBool[0]
+                            elif isElse == True:
+                                return varBool[1]
+                        elif isAnd == False and isOr == False:
+                            if varBool[0] == True:
+                                return varBool[1]
+                            elif isElse == True:
+                                return varBool[2]
+                        elif isAnd == True:
+                            if varBool[0] == True and varBool[1] == True:
+                                return varBool[2]
+                            elif isElse == True:
+                                return varBool[3]
+                        elif isOr == True:
+                            if varBool[0] == True or varBool[1] == True:
+                                return varBool[2]
+                            elif isElse == True:
+                                return varBool[3]
+                                
+                    return varBool[0]
+                elif boolIncrement >= 1:
+                    if varBool[0] == True:
+                        return True
+                    elif varBool[0] == False:
+                        return False
+            except:
+               print('Provide parameter to the if condition!')
+        
+        return None
+    else:
+        print(Compile(string, True))
 
-print(Compile(string))
+print(Compile(string, True))
