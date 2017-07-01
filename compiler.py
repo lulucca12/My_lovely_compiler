@@ -5,7 +5,7 @@ from itertools import chain #import chain function from itertools module
 
 tokens ={
 'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','INDEXTOKEN':'INDEXTOKEN',
-'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','COMPILE':'COMPILE',
+'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','COMPILE':'COMPILE','REMOVEINDEX':'REMOVEINDEX',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -129,6 +129,12 @@ def Compile(strings,toCompile):
     isIndex = False
     index = 0
     tokenIndex = 0
+
+    #is True if you typed REMOVEINDEX
+    isRemove = False
+
+    #strings array
+    names = []
     
     #tests for all possibilities just descibed
     for i in compiler:
@@ -137,11 +143,14 @@ def Compile(strings,toCompile):
             with open("compile.txt","r") as file:
                 string = file.read()
                 break
-        if i == 'INDEXTOKEN':
+        elif i == 'REMOVETOKEN':
+            tokenIndex = tokenIndex + 1
+            isRemove = True
+        elif i == 'INDEXTOKEN':
             if tokenIndex != 0:
                 tokenIndex = tokenIndex + 1
             isIndex = True
-        if i == 'VALUE':
+        elif i == 'VALUE':
             tokenIndex = tokenIndex + 1
             if boolIncrement == 0:
                 isValue = True
@@ -204,6 +213,12 @@ def Compile(strings,toCompile):
             if isIndex == True:
                 index = int(i)
                 isIndex = False
+            elif isRemove == True:
+                index = int(i)
+                isRemove = False    
+        elif(re.match(r"\w+", i)):
+            names.append(str(i))
+
 
     if isCompile == False:
         #tests for if you typed SUM, adds all numbers and returns the result
@@ -213,12 +228,18 @@ def Compile(strings,toCompile):
                     numSum = numSum + element + var
                 isSum = False
             return numSum
+
+        elif isRemove == True:
+            compiler.pop(index)
+            string = compiler
+            return Compile(string,False)
         
-        if isIndex == True:
+        elif isIndex == True:
             compiler[tokenIndex] = compiler[index]
             string = compiler
 ##            string.remove(str(index))
 ##            num.remove(index)
+            index = 0
             return Compile(string, False)
         
         #tests if you typed VALUE and returns the value you typed saving it to a variable
