@@ -1,3 +1,4 @@
+import re
 from itertools import chain #import chain function from itertools module
 
 #an tokens dictionary with all valid tokens
@@ -5,9 +6,7 @@ from itertools import chain #import chain function from itertools module
 tokens ={
 'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','INDEXTOKEN':'INDEXTOKEN',
 'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','COMPILE':'COMPILE',
-'(' : '(', ')' : ')',',':',', '0' : '0', '1' : '1', '2' : '2',
-'3' : '3', '4' : '4',  '5' : '5', '6' : '6',
-'7' : '7', '8' : '8', '9' : '9'
+'(' : '(', ')' : ')',',':','
 }
 
 #prints the prompt and puts the end at the same line
@@ -24,9 +23,15 @@ def Tokens(strings):
     try:
         for i in tokens:
             for j in strings:
-                if(tokens[strings] == strings):
+                if(tokens[strings]):
                     return tokens[strings]
     except:
+        for i in tokens:
+            for j in strings:
+                if(re.match(r"\d+", strings)):
+                    return strings
+                elif(re.match(r"\w+", strings)):
+                    return strings
         return False
 
 
@@ -131,7 +136,7 @@ def Compile(strings,toCompile):
             isCompile = True
             with open("compile.txt","r") as file:
                 string = file.read()
-            break
+                break
         if i == 'INDEXTOKEN':
             if tokenIndex != 0:
                 tokenIndex = tokenIndex + 1
@@ -193,7 +198,7 @@ def Compile(strings,toCompile):
         elif i == 'SQUARE':
             tokenIndex = tokenIndex + 1
             isSquare = True
-        elif (i == '0' or i == '1'or i == '2'or i == '3'or i == '4'or i == '5'or i == '6'or i == '7'or i == '8'or i == '9'):
+        elif (re.match(r"\d+", i)):
             tokenIndex = tokenIndex + 1
             num.append(int(i))
             if isIndex == True:
@@ -212,6 +217,8 @@ def Compile(strings,toCompile):
         if isIndex == True:
             compiler[tokenIndex] = compiler[index]
             string = compiler
+##            string.remove(str(index))
+##            num.remove(index)
             return Compile(string, False)
         
         #tests if you typed VALUE and returns the value you typed saving it to a variable
