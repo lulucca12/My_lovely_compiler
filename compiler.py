@@ -5,7 +5,7 @@ from itertools import chain #import chain function from itertools module
 
 tokens ={
 'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','INDEXTOKEN':'INDEXTOKEN',
-'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','COMPILE':'COMPILE','REMOVEINDEX':'REMOVEINDEX',
+'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -122,8 +122,9 @@ def Compile(strings,toCompile):
     #is True if you typed NOT
     isNot = False
 
-    #is True if you typed COMPILE
-    isCompile = False
+    #is True if you typed IMPORT
+    isImport = False
+    importValue = ""
 
     #is True if you typed INDEXTOKEN
     isIndex = False
@@ -138,11 +139,8 @@ def Compile(strings,toCompile):
     
     #tests for all possibilities just descibed
     for i in compiler:
-        if i == 'COMPILE':
-            isCompile = True
-            with open("compile.txt","r") as file:
-                string = file.read()
-                break
+        if i == 'IMPORT':
+            isImport = True
         elif i == 'REMOVETOKEN':
             tokenIndex = tokenIndex + 1
             isRemove = True
@@ -218,9 +216,11 @@ def Compile(strings,toCompile):
                 isRemove = False    
         elif(re.match(r"\w+", i)):
             names.append(str(i))
+            if isImport == True:
+                importValue = str(i)
 
 
-    if isCompile == False:
+    if isImport == False:
         #tests for if you typed SUM, adds all numbers and returns the result
         if isSum == True:
             for element in num:
@@ -320,6 +320,10 @@ def Compile(strings,toCompile):
         
         return None
     else:
-        print(Compile(string, True))
-
+        try:
+            with open(importValue+".txt","r") as file:
+                    string = file.read()
+            print(Compile(string, True))
+        except:
+            print("No file found, be sure that it is on the same directory as the compiler and that it has the same name")
 print(Compile(string, True))
