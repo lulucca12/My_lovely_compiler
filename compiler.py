@@ -30,6 +30,8 @@ def Tokens(strings):
             for j in strings:
                 if(re.match(r"\d+", strings)):
                     return strings
+                elif(re.match(r"\w+", strings)):
+                    return strings
         return False
 
 
