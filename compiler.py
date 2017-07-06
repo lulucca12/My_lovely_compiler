@@ -4,8 +4,10 @@ from itertools import chain #import chain function from itertools module
 #an tokens dictionary with all valid tokens
 
 tokens ={
-'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE','IF':'IF','INDEXTOKEN':'INDEXTOKEN',
-'ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS','AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
+'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE',
+'IF':'IF','INDEXTOKEN':'INDEXTOKEN','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS',
+'AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
+'FUNCTION':'FUNCTION','START':'START','END':'END',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -76,6 +78,19 @@ def Compile(strings,toCompile):
     #numbers array, stores all numbers
     num = []
 
+    #if you typed FUCNTION evaluates to TRUE
+    isFunction = False
+    compileFunction = Parse(strings)
+    #compileReference = []
+    removeCompiler = False
+    isEnd = False
+    excecutionNameFunction = ""
+    typedStart = False
+    typedEnd = False
+    defineNameFunction = ""
+    indexStart = 0
+    ReturnFunction = ""
+    
     #if you type SUM evaluates to TRUE
     isSum = False
     
@@ -141,6 +156,13 @@ def Compile(strings,toCompile):
     for i in compiler:
         if i == 'IMPORT':
             isImport = True
+        elif i == 'FUNCTION':
+            tokenIndex = tokenIndex + 1
+            isFunction = True
+        elif i == 'START':
+            typedStart = True
+        elif i == 'END':
+            typedEnd = True
         elif i == 'REMOVETOKEN':
             tokenIndex = tokenIndex + 1
             isRemove = True
@@ -216,12 +238,43 @@ def Compile(strings,toCompile):
                 isRemove = False    
         elif(re.match(r"\w+", i)):
             names.append(str(i))
+            if isFunction == True:
+                if typedStart == True and typedEnd == True:
+                    excecutionNameFunction = str(i)
+                #print(i);
+                elif typedStart == False and typedEnd == False:
+                    #print(i)
+                    defineNameFunction = str(i)
             if isImport == True:
                 importValue = str(i)
-
-
+                
     if isImport == False:
+
+        if isFunction == True:
+            isFunction = False
+
+            compiler = Parse(strings)
+            del compiler[compiler.index('FUNCTION'):compiler.index('END')+1]
+
+            indexStart = compileFunction.index('START')
+            
+            del compileFunction[0:indexStart + 1]
+            
+            if compileFunction[-1] != 'END':
+                del compileFunction[compileFunction.index('END') : compileFunction.index(compileFunction[-1]) + 1]
+            else:
+                compileFunction.remove('END')
+            
+            ReturnFunction = str(Compile(' '.join(compileFunction), True))
+
+            for i in compiler:
+                if i == excecutionNameFunction:
+                    compiler[compiler.index(i)] = ReturnFunction.upper()
+            
+            return Compile(' '.join(compiler) , True)
+
         #tests for if you typed SUM, adds all numbers and returns the result
+            return
         if isSum == True:
             for element in num:
                 if element != var:  
@@ -317,7 +370,7 @@ def Compile(strings,toCompile):
                         return False
             except:
                print('Provide parameter to the if condition!')
-        
+               
         return None
     else:
         try:
