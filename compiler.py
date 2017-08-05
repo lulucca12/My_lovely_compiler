@@ -17,6 +17,7 @@ print("My_lovely_Compiler >>>",end='')
 #the string input from the prompt
 string = input()
 
+
 #function Tokens that recieves a string and verifies if it is valid
 #if so returns it self
 #else returns false
@@ -94,16 +95,16 @@ def Compile(strings,toCompile):
     #if you type SUM evaluates to TRUE
     isSum = False
     
-    #if you type SUM evaluates to TRUE
+    #if you type VALUE evaluates to TRUE
     isValue = False
     
-    #if you type SUM evaluates to TRUE
+    #if you type IF evaluates to TRUE
     isIf = False
     
-     #if you type SUM evaluates to TRUE
+     #if you type ELSE evaluates to TRUE
     isElse = False
     
-     #if you type SUM evaluates to TRUE
+    #if you type FOR evaluates to TRUE
     isFor = False
 
     #if you type VALUE next to a number saves it here
@@ -140,6 +141,8 @@ def Compile(strings,toCompile):
     #is True if you typed IMPORT
     isImport = False
     importValue = ""
+    importString = ""
+    importStringTester = True
 
     #is True if you typed INDEXTOKEN
     isIndex = False
@@ -250,8 +253,9 @@ def Compile(strings,toCompile):
                 elif typedStart == False and typedEnd == False:
                     #print(i)
                     defineNameFunction = str(i)
-            if isImport == True:
+            if isImport == True and importStringTester == True:
                 importValue = str(i)
+                importStringTester = False
                 
     if isImport == False:
 
@@ -382,10 +386,15 @@ def Compile(strings,toCompile):
                
         return None
     else:
-        try:
+        #try:
+            isImport = False
             with open(importValue+".txt","r") as file:
-                    string = file.read()
-            print(Compile(string, True))
-        except:
-            print("No file found, be sure that it is on the same directory as the compiler and that it has the same name")
+                    importString = file.read()
+
+            compiler[compiler.index('IMPORT') + 1] = ' '
+            compiler[compiler.index('IMPORT')] = ' ' + importString
+            #print(compiler)
+            return Compile(' '.join(compiler), True)
+        #except:
+            #print("No file found, be sure that it is on the same directory as the compiler and that it has the same name")
 print(Compile(string, True))
