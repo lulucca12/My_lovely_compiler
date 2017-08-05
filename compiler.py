@@ -7,7 +7,7 @@ tokens ={
 'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE',
 'IF':'IF','INDEXTOKEN':'INDEXTOKEN','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS',
 'AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
-'FUNCTION':'FUNCTION','START':'START','END':'END',
+'FUNCTION':'FUNCTION','START':'START','END':'END','PRINT':'PRINT',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -30,7 +30,7 @@ def Tokens(strings):
     except:
         for i in tokens:
             for j in strings:
-                if(re.match(r"\d+", strings)):
+                if(re.match(r"^-*[0-9,\.]+$", strings)):
                     return strings
                 elif(re.match(r"\w+", strings)):
                     return strings
@@ -149,6 +149,9 @@ def Compile(strings,toCompile):
     #is True if you typed REMOVEINDEX
     isRemove = False
 
+    #is True if you typed PRINT
+    isPrint = False
+
     #strings array
     names = []
     
@@ -178,6 +181,8 @@ def Compile(strings,toCompile):
             tokenIndex = tokenIndex + 1
             isValue = False
             isFor = True
+        elif i == 'PRINT':
+            isPrint = True
         elif i == 'IF':
             tokenIndex = tokenIndex + 1
             isValue = False
@@ -227,14 +232,14 @@ def Compile(strings,toCompile):
         elif i == 'SQUARE':
             tokenIndex = tokenIndex + 1
             isSquare = True
-        elif (re.match(r"\d+", i)):
+        elif (re.match(r"^-*[0-9,\.]+$", i)):
             tokenIndex = tokenIndex + 1
-            num.append(int(i))
+            num.append(float(i))
             if isIndex == True:
-                index = int(i)
+                index = float(i)
                 isIndex = False
             elif isRemove == True:
-                index = int(i)
+                index = float(i)
                 isRemove = False    
         elif(re.match(r"\w+", i)):
             names.append(str(i))
@@ -274,7 +279,7 @@ def Compile(strings,toCompile):
             return Compile(' '.join(compiler) , True)
 
         #tests for if you typed SUM, adds all numbers and returns the result
-            return
+            #return
         if isSum == True:
             for element in num:
                 if element != var:  
@@ -306,6 +311,10 @@ def Compile(strings,toCompile):
             except:
                 print('No value provided to the variable ')
 
+
+        elif isPrint == True:
+            print(compiler[compiler.index('PRINT') + 1])
+            
         #tests if you typed SQU and returns the square of all elements
         if isSquare == True:
             if isValue == True:
