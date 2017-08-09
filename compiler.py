@@ -8,6 +8,7 @@ tokens ={
 'IF':'IF','INDEXTOKEN':'INDEXTOKEN','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS',
 'AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
 'FUNCTION':'FUNCTION','START':'START','END':'END','PRINT':'PRINT','PARAMETER':'PARAMETER',
+'PRODUCT':'PRODUCT',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -98,6 +99,10 @@ def Compile(strings,toCompile):
     
     #if you type SUM evaluates to TRUE
     isSum = False
+    
+    #if you typed PRODUCT evaluates to TRUE
+    isProduct = False
+    varProduct = 1
     
     #if you type VALUE evaluates to TRUE
     isValue = False
@@ -238,6 +243,9 @@ def Compile(strings,toCompile):
         elif i == 'SUM':
             tokenIndex = tokenIndex + 1
             isSum = True
+        elif i == 'PRODUCT':
+            tokenIndex = tokenIndex + 1
+            isProduct = True
         elif i == 'SQUARE':
             tokenIndex = tokenIndex + 1
             isSquare = True
@@ -287,25 +295,36 @@ replacing its value with the calling of the function
                 isParameter = False
                 try:
                     parameterName = compileFunction[compileFunction.index('PARAMETER') + 1]
-                    parameterValue = compiler[compiler.index(excecutionNameFunction) + 1]
-                    del compiler[compiler.index(excecutionNameFunction) + 1]
-                    compileFunction.pop(compileFunction.index('PARAMETER') + 1)
-                    compileFunction.pop(compileFunction.index('PARAMETER'))
-                    for i in compileFunction:
-                        if i == parameterName:
-                            parameterString = ' '.join(compileFunction)
-                            parameterString = parameterString.replace(parameterName, parameterValue)
-                            compileFunction = parameterString.split()
-                
+                    if excecutionNameFunction != '':
+                        parameterValue = compiler[compiler.index(excecutionNameFunction) + 1]
+                        del compiler[compiler.index(excecutionNameFunction) + 1]
+                        compileFunction.pop(compileFunction.index('PARAMETER') + 1)
+                        compileFunction.pop(compileFunction.index('PARAMETER'))
+                        for i in compileFunction:
+                            if i == parameterName:
+                                parameterString = ' '.join(compileFunction)
+                                parameterString = parameterString.replace(parameterName, parameterValue)
+                                compileFunction = parameterString.split()
+                    else:
+                        compileFunction.pop(compileFunction.index('PARAMETER') + 1)
+                        compileFunction.pop(compileFunction.index('PARAMETER'))
+            
                 except:
                     print('provide parameter value')
-                    
+     
             ReturnFunction = str(Compile(' '.join(compileFunction), True))
+        
             for i in compiler:
                 if i == excecutionNameFunction:
                     compiler[compiler.index(i)] = ReturnFunction.upper()
+
+            if(int(' '.join(compiler)) is not None):
+                
+                return int(' '.join(compiler))
             
-            return Compile(' '.join(compiler) , True)
+            else:
+                
+                return Compile(' '.join(compiler) , True)
 
         #tests for if you typed SUM, adds all numbers and returns the result
             #return
@@ -316,6 +335,12 @@ replacing its value with the calling of the function
                 isSum = False
             return numSum
 
+        elif isProduct == True:
+            for i in range(int(compiler[compiler.index('PRODUCT') + 2]) + 1):
+                if i >= int(compiler[compiler.index('PRODUCT') + 1]):
+                    varProduct = varProduct * i
+            return varProduct
+            
         elif isRemove == True:
             compiler.pop(index)
             string = compiler
