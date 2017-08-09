@@ -7,7 +7,7 @@ tokens ={
 'SUM' : 'SUM','SQUARE':'SQUARE','VALUE':'VALUE','TRUE':'TRUE','FALSE':'FALSE',
 'IF':'IF','INDEXTOKEN':'INDEXTOKEN','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS',
 'AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
-'FUNCTION':'FUNCTION','START':'START','END':'END','PRINT':'PRINT',
+'FUNCTION':'FUNCTION','START':'START','END':'END','PRINT':'PRINT','PARAMETER':'PARAMETER',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -16,6 +16,7 @@ print("My_lovely_Compiler >>>",end='')
 
 #the string input from the prompt
 string = input()
+
 
 #function Tokens that recieves a string and verifies if it is valid
 #if so returns it self
@@ -90,20 +91,24 @@ def Compile(strings,toCompile):
     defineNameFunction = ""
     indexStart = 0
     ReturnFunction = ""
+    parameterName = ""
+    parameterValue = ""
+    parameterString = ""
+    isParameter = False
     
     #if you type SUM evaluates to TRUE
     isSum = False
     
-    #if you type SUM evaluates to TRUE
+    #if you type VALUE evaluates to TRUE
     isValue = False
     
-    #if you type SUM evaluates to TRUE
+    #if you type IF evaluates to TRUE
     isIf = False
     
-     #if you type SUM evaluates to TRUE
+     #if you type ELSE evaluates to TRUE
     isElse = False
     
-     #if you type SUM evaluates to TRUE
+    #if you type FOR evaluates to TRUE
     isFor = False
 
     #if you type VALUE next to a number saves it here
@@ -140,6 +145,8 @@ def Compile(strings,toCompile):
     #is True if you typed IMPORT
     isImport = False
     importValue = ""
+    importString = ""
+    importStringTester = True
 
     #is True if you typed INDEXTOKEN
     isIndex = False
@@ -162,6 +169,8 @@ def Compile(strings,toCompile):
         elif i == 'FUNCTION':
             tokenIndex = tokenIndex + 1
             isFunction = True
+        elif i == 'PARAMETER':
+            isParameter = True
         elif i == 'START':
             typedStart = True
         elif i == 'END':
@@ -250,11 +259,16 @@ def Compile(strings,toCompile):
                 elif typedStart == False and typedEnd == False:
                     #print(i)
                     defineNameFunction = str(i)
-            if isImport == True:
+            if isImport == True and importStringTester == True:
                 importValue = str(i)
+                importStringTester = False
                 
     if isImport == False:
+        '''
+The function works by separating whats in the block of code(START, END) and whats not(else) and compiling whats inside and
+replacing its value with the calling of the function 
 
+        '''
         if isFunction == True:
             isFunction = False
 
@@ -262,16 +276,31 @@ def Compile(strings,toCompile):
             del compiler[compiler.index('FUNCTION'):compiler.index('END')+1]
 
             indexStart = compileFunction.index('START')
-            
-            del compileFunction[0:indexStart + 1]
-            
+            del compileFunction[0:compileFunction.index('FUNCTION') + 2]
+            compileFunction.pop(indexStart - 2)
             if compileFunction[-1] != 'END':
                 del compileFunction[compileFunction.index('END') : compileFunction.index(compileFunction[-1]) + 1]
             else:
                 compileFunction.remove('END')
-            
-            ReturnFunction = str(Compile(' '.join(compileFunction), True))
 
+            if isParameter == True:
+                isParameter = False
+                try:
+                    parameterName = compileFunction[compileFunction.index('PARAMETER') + 1]
+                    parameterValue = compiler[compiler.index(excecutionNameFunction) + 1]
+                    del compiler[compiler.index(excecutionNameFunction) + 1]
+                    compileFunction.pop(compileFunction.index('PARAMETER') + 1)
+                    compileFunction.pop(compileFunction.index('PARAMETER'))
+                    for i in compileFunction:
+                        if i == parameterName:
+                            parameterString = ' '.join(compileFunction)
+                            parameterString = parameterString.replace(parameterName, parameterValue)
+                            compileFunction = parameterString.split()
+                
+                except:
+                    print('provide parameter value')
+                    
+            ReturnFunction = str(Compile(' '.join(compileFunction), True))
             for i in compiler:
                 if i == excecutionNameFunction:
                     compiler[compiler.index(i)] = ReturnFunction.upper()
@@ -383,9 +412,14 @@ def Compile(strings,toCompile):
         return None
     else:
         try:
+            isImport = False
             with open(importValue+".txt","r") as file:
-                    string = file.read()
-            print(Compile(string, True))
+                    importString = file.read()
+
+            compiler[compiler.index('IMPORT') + 1] = ' '
+            compiler[compiler.index('IMPORT')] = ' ' + importString
+            #print(compiler)
+            return Compile(' '.join(compiler), True)
         except:
             print("No file found, be sure that it is on the same directory as the compiler and that it has the same name")
 print(Compile(string, True))
