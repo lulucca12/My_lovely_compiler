@@ -8,7 +8,7 @@ tokens ={
 'IF':'IF','INDEXTOKEN':'INDEXTOKEN','ELSE':'ELSE','FOR':'FOR','EQUALS':'EQUALS',
 'AND':'AND','OR':'OR','NOT':'NOT','IMPORT':'IMPORT','REMOVEINDEX':'REMOVEINDEX',
 'FUNCTION':'FUNCTION','START':'START','END':'END','PRINT':'PRINT','PARAMETER':'PARAMETER',
-'PRODUCT':'PRODUCT',
+'PRODUCT':'PRODUCT','ENDFOR':'ENDFOR',
 '(' : '(', ')' : ')',',':','
 }
 
@@ -89,7 +89,7 @@ def Compile(strings,toCompile):
     excecutionNameFunction = ""
     typedStart = False
     typedEnd = False
-    defineNameFunction = ""
+    #defineNameFunction = ""
     indexStart = 0
     ReturnFunction = ""
     parameterName = ""
@@ -263,10 +263,11 @@ def Compile(strings,toCompile):
             if isFunction == True:
                 if typedStart == True and typedEnd == True:
                     excecutionNameFunction = str(i)
-                #print(i);
-                elif typedStart == False and typedEnd == False:
-                    #print(i)
-                    defineNameFunction = str(i)
+                    typedStart = False
+                    #print(i);
+##                elif typedStart == False and typedEnd == False:
+##                    print(i)
+##                    defineNameFunction = str(i)
             if isImport == True and importStringTester == True:
                 importValue = str(i)
                 importStringTester = False
@@ -293,37 +294,32 @@ replacing its value with the calling of the function
 
             if isParameter == True:
                 isParameter = False
-                try:
-                    parameterName = compileFunction[compileFunction.index('PARAMETER') + 1]
-                    if excecutionNameFunction != '':
-                        parameterValue = compiler[compiler.index(excecutionNameFunction) + 1]
-                        del compiler[compiler.index(excecutionNameFunction) + 1]
-                        compileFunction.pop(compileFunction.index('PARAMETER') + 1)
-                        compileFunction.pop(compileFunction.index('PARAMETER'))
-                        for i in compileFunction:
-                            if i == parameterName:
-                                parameterString = ' '.join(compileFunction)
-                                parameterString = parameterString.replace(parameterName, parameterValue)
-                                compileFunction = parameterString.split()
-                    else:
-                        compileFunction.pop(compileFunction.index('PARAMETER') + 1)
-                        compileFunction.pop(compileFunction.index('PARAMETER'))
-            
-                except:
-                    print('provide parameter value')
-     
+                #try:
+                parameterName = compileFunction[compileFunction.index('PARAMETER') + 1]
+                if excecutionNameFunction != '':
+                    parameterValue = compiler[compiler.index(excecutionNameFunction) + 1]
+                    del compiler[compiler.index(excecutionNameFunction) + 1]
+                    compileFunction.pop(compileFunction.index('PARAMETER') + 1)
+                    compileFunction.pop(compileFunction.index('PARAMETER'))
+                    for i in compileFunction:
+                        if i == parameterName:
+                            parameterString = ' '.join(compileFunction)
+                            parameterString = parameterString.replace(parameterName, parameterValue)
+                            compileFunction = parameterString.split()
+                else:                     
+                        compileFunction = []
+                #except:
+                    #print('provide parameter value')
+
             ReturnFunction = str(Compile(' '.join(compileFunction), True))
         
             for i in compiler:
                 if i == excecutionNameFunction:
                     compiler[compiler.index(i)] = ReturnFunction.upper()
 
-            if(int(' '.join(compiler)) is not None):
-                
-                return int(' '.join(compiler))
-            
-            else:
-                
+            try:
+                return float(' '.join(compiler))
+            except:
                 return Compile(' '.join(compiler) , True)
 
         #tests for if you typed SUM, adds all numbers and returns the result
@@ -385,9 +381,15 @@ replacing its value with the calling of the function
         #thows exception for no parameters
         elif isFor == True and isSum == False:
             try:
-                for i in range(num[0]):
-                    varFor = varFor +' '+ str(num[1])
-                return varFor
+                compileFor = Parse(strings)
+                run = compiler.index("FOR") + 1
+                del compileFor[0 : compileFor.index("FOR") + 2]
+                if isPrint == True:
+                    for i in range(int(compiler[int(run)]) - 1):
+                        print(Compile(' '.join(compileFor), True))
+                else:
+                    for i in range(int(compiler[int(run)])):
+                        print(Compile(' '.join(compileFor), True))
                     
             except:
                 print ('No value provided to the for')
@@ -434,9 +436,9 @@ replacing its value with the calling of the function
             except:
                print('Provide parameter to the if condition!')
                
-        return None
+        return ""
     else:
-        try:
+        #try:
             isImport = False
             with open(importValue+".txt","r") as file:
                     importString = file.read()
@@ -445,6 +447,6 @@ replacing its value with the calling of the function
             compiler[compiler.index('IMPORT')] = ' ' + importString
             #print(compiler)
             return Compile(' '.join(compiler), True)
-        except:
-            print("No file found, be sure that it is on the same directory as the compiler and that it has the same name")
+        #except:
+            #print("No file found, be sure that it is on the same directory as the compiler and that it has the same name")
 print(Compile(string, True))
