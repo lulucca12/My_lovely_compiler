@@ -220,26 +220,14 @@ def Compile(strings,toCompile):
             isElse = True
         elif i == 'TRUE':
             tokenIndex = tokenIndex + 1
-            if isNot == False:
-                boolIncrement = boolIncrement + 1
-                isValue = False
-                varBool.append(True)
-            else:
-                boolIncrement = boolIncrement + 1
-                isValue = False
-                varBool.append(False)
-                isNot = False
+            boolIncrement = boolIncrement + 1
+            isValue = False
+            varBool.append(True)
         elif i == 'FALSE':
             tokenIndex = tokenIndex + 1
-            if isNot == False:
-                boolIncrement = boolIncrement + 1
-                isValue = False
-                varBool.append(False)
-            else:
-                boolIncrement = boolIncrement + 1
-                isValue = False
-                varBool.append(True)
-                isNot = False
+            boolIncrement = boolIncrement + 1
+            isValue = False
+            varBool.append(False)
         elif i == 'SUM':
             tokenIndex = tokenIndex + 1
             isSum = True
@@ -397,44 +385,51 @@ replacing its value with the calling of the function
         #tests if its not a variable and you typed IF
         #if so return the value based on the parameters(bugy)
         #throws exception for no parameters
-        elif isValue == False:
+
+        finalReturn = ""
+        if isNot == True:
+            if(compiler[compiler.index("NOT") + 1] == "TRUE"):
+                finalReturn = "FALSE"
+            else:
+                finalReturn = "TRUE"
+        if isEqual == True:
+            if(compiler[compiler.index("EQUALS") - 1] == compiler[compiler.index("EQUALS") + 1]):
+                finalReturn = "TRUE"
+            else:
+                finalReturn = "FALSE"
+
+        if isAnd == True:
+            if(compiler[compiler.index("AND") - 1] == "TRUE" and (compiler[compiler.index("AND") + 1] == "TRUE" or finalReturn == "TRUE")):
+                finalReturn = "TRUE"
+            else:
+                finalReturn = "FALSE"
+
+        if isOr == True:
+            #print(compiler[compiler.index("OR") - 1])
+            if(compiler[compiler.index("OR") - 1] == "TRUE" or compiler[compiler.index("OR") + 1] == "TRUE"):
+                finalReturn = "TRUE"
+            else:
+                finalReturn = "FALSE"
+
+        if(isIf == False):
+            if (isOr == True or isEqual == True or isAnd == True or isNot == True):
+                print(finalReturn)
+        else:
             try:
-                if isIf == True: 
-                    if boolIncrement > 4:
-                        if varBool[1] == True:
-                            return varBool[2]
-                        elif isElse == True:
-                            return varBool[3]
-                    else:
-                        if isEqual == True:
-                            if(num[0] == num[1]):
-                                return varBool[0]
-                            elif isElse == True:
-                                return varBool[1]
-                        elif isAnd == False and isOr == False:
-                            if varBool[0] == True:
-                                return varBool[1]
-                            elif isElse == True:
-                                return varBool[2]
-                        elif isAnd == True:
-                            if varBool[0] == True and varBool[1] == True:
-                                return varBool[2]
-                            elif isElse == True:
-                                return varBool[3]
-                        elif isOr == True:
-                            if varBool[0] == True or varBool[1] == True:
-                                return varBool[2]
-                            elif isElse == True:
-                                return varBool[3]
-                                
-                    return varBool[0]
-                elif boolIncrement >= 1:
-                    if varBool[0] == True:
-                        return True
-                    elif varBool[0] == False:
-                        return False
+                if(finalReturn == "TRUE"):
+                    #print("y")
+                    compileIf = Parse(strings)
+                    del compileIf[0 : compileIf.index("THEN") + 1]
+                    del compileIf[compileIf.index("ENDIF") : -1]
+                    return Compile(' '.join(compileIf), True)
+                elif(isElse == True):
+                    #print("n")
+                    compileElse = Parse(strings)
+                    del compileElse[0 : compileElse.index("ELSE") + 1]
+                    del compileElse[compileElse.index("ENDIF") : -1]
+                    return Compile(' '.join(compileElse), True)
             except:
-               print('Provide parameter to the if condition!')
+                print("Incorrect IF syntax")
                
         return ""
     else:
